@@ -1,0 +1,42 @@
+<div ng-controller='OrderController'>
+    <h1 style="text-decoration:underline">Add a new order</h1>
+    <form>
+        Customer
+        <select class='browser-default' ng-model='newOrder.customer' ng-options='customer.name for customer in customers'>
+        </select>
+        <br>
+        Order
+        <select class='browser-default' ng-model='newOrder.qty'>
+            <option value='' selected disabled>Qty</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+        </select>
+
+        <select class='browser-default' ng-model='newOrder.product' option ng-options='product.name for product in products'>
+        </select>
+        <br>
+        <input type='submit' value='Order' style="margin-left:200px; margin-top:10px; background-color:blue; color:white" ng-click='addOrder(newOrder)'>
+    </form>
+
+    <input type="text" style="margin-left:1000px" placeholder="filter..."ng-model="filter_name">
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Customer Name</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="order in orders |filter:filter_name">
+                <td>{{order._name.name}}</td>
+                <td>{{order._product.name}}</td>
+                <td>{{order.qty}}</td>
+                <td>{{order.created_at| date: 'MMMM dd, yyyy'}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
