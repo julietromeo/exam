@@ -20,9 +20,9 @@
             <br><br>
             Complain: <textarea rows='4' name='text' ng-minlength='10' ng-model='new.text' required></textarea><br>
             <p ng-show="appt.text.$error.minlength" style="color:red">Complain is too short.</p>
-            <p ng-show="appt.text.$error.required" style="color:red">Complain is required</p>
+            <p ng-show="appt.text.$error.required" style="color:red">Complain is required<br>You can only make one appointment per day</p>
 
-            <input type="submit" value="Cancel">
+            <a href="#/dashboard/{{currentuser._id}}"><input type="submit" value="Cancel"></a>
             <input type='submit' style="margin-left:10px; margin-top:10px; background-color:blue; color:white" value='Add Appointment' ng-click='create()'>
         </form>
 

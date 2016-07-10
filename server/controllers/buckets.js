@@ -16,19 +16,32 @@ return {
         })
     },
 
+
     create:function(req,res){
         console.log(req.body,'reqbodyyyyy')
-        var newAppt=new Bucket({date:req.body.date, time:req.body.time, text:req.body.text, _name:req.body.id.id.id})
+        Bucket.find({date:req.body.date}, function(err, results) {
+            console.log(results,'seeeeeee')
+            if (results.length > 2){
+                res.redirect('#/user/'+req.body.id.id.id)
+            }
 
-        newAppt.save(function(err,results){
-            if(err){
-                console.log('failed')
-            }
-            else{
-                console.log('success')
-                res.json(results)
-            }
+                else{
+                    var newAppt=new Bucket({date:req.body.date, time:req.body.time, text:req.body.text, _name:req.body.id.id.id})
+
+                    newAppt.save(function(err,results){
+                        if(err){
+                            console.log('failed')
+                        }
+                        else{
+                            console.log('success')
+                            res.json(results)
+                        }
+                    })
+                }
+
         })
+
+
     },
 
     remove:function(req,res){
