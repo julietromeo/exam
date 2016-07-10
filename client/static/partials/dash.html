@@ -1,0 +1,28 @@
+<div ng-controller='BucketController'>
+    <h1 style="">Welcome, {{currentuser.name}}!</h1>
+    <h2>Doctor's Appointments</h2>
+    <p style="margin-left:1000px">Search: <input type="text" style="" placeholder="" ng-model="filter_name"></p>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Patient Name</th>
+                <th>Complain</th>
+                <th>Cancel</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="appt in appts|filter:filter_name">
+                <td>{{appt.date}}</td>
+                <td>{{appt.time}}</td>
+                <td>{{appt._name.name}}</td>
+                <td>{{appt.text}}</td>
+                <td><button ng-if='currentuser._id == appt._name._id' style="background-color:red; color:white" ng-click="delete(appt)">Cancel</button></td>
+            </tr>
+        </tbody>
+    </table>
+    <a href='#/user/{{currentuser._id}}'><input type='submit' style="margin-top:300px; margin-left:1200px" value='Add New Appointment'></a>
+</div>

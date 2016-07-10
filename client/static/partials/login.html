@@ -1,0 +1,13 @@
+<div ng-controller='UserController'>
+    <div style="margin-left:500px;">
+        <h1>Appointment</h1>
+        <form name="login">
+            Name: <input type="text" name='login' ng-model=newUser.name ng-minlength='3' required><br>
+            <input type="submit" value="Enter" style="margin-left:300px" ng-click=create(newUser)>
+        </form>
+
+        <p ng-show="login.login.$error.minlength" style="color:red">Username is too short.</p>
+        <p ng-show="login.login.$error.required" style="color:red">User name required</p>
+
+    </div>
+</div>

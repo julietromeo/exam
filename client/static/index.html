@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Mini MEAN Store</title>
+<title>Doctor</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
@@ -9,241 +9,185 @@
 <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.5/angular-route.min.js"></script>
 <script>
 
-var mini_app = angular.module('mini_app', ['ngRoute']);
+var bucket_app = angular.module('bucket_app', ['ngRoute']);
 
-mini_app.config(function($routeProvider) {
+bucket_app.config(function($routeProvider) {
     $routeProvider
         .when('/', {
-            templateUrl: '/partials/dashboard.html'
+            templateUrl: '/partials/login.html'
         })
-        .when('/partials2', {
-            templateUrl: '/partials/product.html'
+
+        .when('/dashboard/:id', {
+            templateUrl: '/partials/dash.html'
         })
-        .when('/partials3', {
-            templateUrl: '/partials/order.html'
+        .when('/dashboard', {
+            templateUrl: '/partials/dash.html'
         })
-        .when('/partials4', {
-            templateUrl: '/partials/customer.html'
-        })
-        .when('/partials5', {
-            templateUrl: '/partials/setting.html'
+        .when('/user/:id', {
+            templateUrl: '/partials/add.html'
         })
         .otherwise({
             redirectTo: '/'
         });
 });
 
-//-------------------------------------------cust factory!
-mini_app.factory('CustomerFactory', function($http) {
+//-------------------------------------------user factory!
+bucket_app.factory('UserFactory', function($http) {
   var factory = {};
-  var customers = [];
+  var users = [];
+  var currentuser=[];
 
     factory.index = function(callback) {
-        $http.get('/allcust').success(function(output) {
-            customers = output;
-            callback(customers);
-        })
+      $http.get('/alluser').success(function(output) {
+          users = output;
+          callback(users)
+      })
     }
+
+    factory.currentuser = function(id, callback){
+    	$http.post('/currentuser', {id:id}).success(function(output){
+			callback(output)
+            currentuser=output
+            console.log(currentuser,'current')
+			});
+    }
+
+
     factory.create = function(info, callback) {
-        $http.post('/addcust', info).success(function(output){
+        $http.post('/adduser', info).success(function(output){
             // console.log(output, "added and came back")
             callback(output)
+            console.log(output, 'output')
         })
 
     }
-    factory.recent=function(callback){
-        $http.get('/recent').success(function(output){
+    factory.oneuser=function(id, callback){
+        $http.post('/oneuser',{id:id}).success(function(output){
             callback(output)
         })
     }
-    factory.remove=function(customer){
-        $http.get('/delete/'+customer._id).success(function(output){
-        })
-    }
+
 return factory;
 });
-//-------------------------------------------order factory
-mini_app.factory('OrderFactory', function($http) {
+//-------------------------------------------bucket factory
+bucket_app.factory('BucketFactory', function($http) {
     var factory = {};
-    var orders = [];
-    var products=[]
+    var buckets = [];
 
-    factory.allorders = function(callback) {
-        $http.get('/allorders').success(function(output) {
-            orders = output;
-            callback(orders);
-        })
-    }
 
-    factory.allproducts = function(callback) {
-        callback(products);
+    factory.allappts = function(callback) {
+    	$http.post('/allappts').success(function(output){
+                console.log(output,'please come here')
+    			callback(output)
+    			});
     }
 
     factory.create = function(info) {
-        // console.log(info,'info')
-        //Object {customer: "5767682640ffc8c109f8e8a4", qty: "2", product: "576786728a1355d70bcb3e36"}
-        $http.post('/addorder', info).success(function(output){
-            // console.log(output,'output')
-            //orders=[Object, Object, Object...]
-            //[{},{},{}...]
-            //order in orders -> Obj= {_id:'233342d', _name:{name:'Juliet'..}, _product:{product:'dress'..}, qty:'3'..}
+        console.log(info,'info from factory')
+        $http.post('/addappt', info).success(function(output){
+            // console.log(output, 'output')
         })
 
     }
+
+    factory.remove=function(data){
+        console.log(data,'what is in?')
+        $http.get('/delete/'+data._id).success(function(output){
+
+        })
+    }
+
 
 return factory;
 });
-//-------------------------------------------product factory
-mini_app.factory('ProductFactory', function($http) {
-    var factory = {};
-    var products = [];
 
-    factory.allproducts = function(callback) {
-        $http.get('/allproducts').success(function(output) {
-            products = output;
-            callback(products);
-        })
-    }
+// ---------------------------------------user controller!
+bucket_app.controller('UserController', function($scope, UserFactory, $location) {
+    $scope.users = [];
 
-    factory.create = function(info, callback) {
-        $http.post('/addproduct', info).success(function(output){
-            // console.log(output, "added and came back")
-            callback(output)
-        })
-
-    }
-
-return factory;
-});
-// ---------------------------------------cust controller!
-mini_app.controller('CustomerController', function($scope, CustomerFactory) {
-    $scope.customers = [];
-    $scope.recents=[]
-
-    function init(){
-        CustomerFactory.index(function(data) {
-            $scope.customers = data;
+    // function init(){
+        UserFactory.index(function(data) {
+            $scope.users = data;
         });
-    }
-    init()
-
-    function update(){
-    CustomerFactory.recent(function(data){
-        $scope.recents=data
-    })
-    }
-    update()
+    // }
+    // init()
 
     $scope.create = function() {
-        if($scope.isDuplicate()){
-        }
-        else{
-        CustomerFactory.create($scope.newCust, function(data){
+        UserFactory.create($scope.newUser, function(data){
             // console.log(data, "this is the output from factory reached scope")
-            $scope.customers=data
-            $scope.newCust = {};
+            $scope.users=data
+            // console.log($scope.users,'scope.users')
+            // console.log($scope.users.name,'name')
+            $scope.newUser = {};
+            $location.url('/dashboard/'+$scope.users._id);
         });
     }
-    }
 
-    $scope.isDuplicate = function(){
-        for(var i=0;i<$scope.customers.length;i++){
-            if($scope.newCust !== undefined){
-                if($scope.newCust.name == $scope.customers[i].name){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-    $scope.deleteCustomer=function(customer){
-        CustomerFactory.remove(customer);
-        init();
-    }
+
 })
-//---------------------------------------------------order con
-mini_app.controller('OrderController', function($scope, OrderFactory, CustomerFactory, ProductFactory) {
-    $scope.orders = [];
-    $scope.customers = [];
-    $scope.products=[]
+//---------------------------------------------------bucket con
+bucket_app.controller('BucketController', function($scope, $location, UserFactory, BucketFactory, $routeParams) {
+    $scope.buckets = [];
+    $scope.users = [];
+    $scope.currentuser=[];
+    $scope.appts=[]
 
-        CustomerFactory.index(function(data) {
-            $scope.customers = data;
+        UserFactory.currentuser($routeParams.id, function(data){
+            // console.log(data,'lets see')
+            $scope.currentuser= data;
         });
 
+
+        UserFactory.index(function(data) {
+            $scope.users = data;
+            console.log(data,'data')
+        });
+
+        // UserFactory.index($routeParams.id, function(data){
+        //     $scope.buckets = data;
+        //     console.log(data,'lets see')
+        // });
         function init(){
-        OrderFactory.allorders(function(data) {
-            $scope.orders = data;
-        });
-        }init()
+        BucketFactory.allappts(function(data) {
+            $scope.appts = data;
+            console.log($scope.appts,'appts')
 
-        ProductFactory.allproducts(function(data) {
-            $scope.products = data;
         });
-
-    $scope.addOrder = function(newOrder) {
-        //console.log(newOrder,'newOrder')
-        //Object {customer: Object, qty: "2", product: Object}
-        //console.log(newOrder.customer,'newOrder.customer')
-        //Object {_id: "576796000272934a0c081dab", name: "Romeo", __v: 0, created_at: "2016-06-20T07:06:40.894Z"}
-        newOrder.customer= newOrder.customer._id
-        //console.log(newOrder.customer, 'newOrder.customer')
-        //576796000272934a0c081dab
-        //console.log(newOrder, 'after cust switched')
-        //replaced so: Object {customer: "576796030272934a0c081dac", qty: "3", product: Object}
-        newOrder.product= newOrder.product._id
-        // console.log(newOrder, 'after all switched')
-        // {customer: "576796000272934a0c081dab", qty: "1", product: "576786728a1355d70bcb3e36"}
-        OrderFactory.create(newOrder)
+        }
         init()
-    }
-})
 
-// ---------------------------------------product controller
-mini_app.controller('ProductController', function($scope, ProductFactory) {
-    $scope.products = [];
 
-    function init(){
-        ProductFactory.allproducts(function(data) {
-            $scope.products = data;
-        });
-    }
-    init()
 
-    $scope.create = function() {
-        ProductFactory.create($scope.newProduct, function(data){
-            // console.log(data, "this is the output from factory reached scope")
-            $scope.products=data
-            $scope.newProduct = {};
-        });
-    }
-})
-// ---------------------------------------dashboard controller
-mini_app.controller('DashboardController', function($scope, CustomerFactory, ProductFactory, OrderFactory) {
-    ProductFactory.allproducts(function(data) {
-        $scope.products = data;
-    });
+        $scope.create = function(data) {
+            // console.log($scope.new,'newww')
+            console.log($routeParams,'params')
+            id={id:$routeParams}
+            $scope.new.id=id
 
-    CustomerFactory.index(function(data) {
-        $scope.customers = data;
-    });
+            BucketFactory.create($scope.new, function(){
+                console.log($scope.new,'newww')
+                BucketFactory.allappts(function(data){
+                    $scope.appts=data
+                })
+            })
+        $location.url('/dashboard/'+$scope.new.id.id.id)
 
-    OrderFactory.allorders(function(data) {
-        $scope.orders = data;
-    });
-    
-    CustomerFactory.recent(function(data){
-        $scope.recents=data
-    })
+        }
+
+        $scope.delete=function(appt){
+            console.log(appt, 'delete')
+            BucketFactory.remove(appt);
+            init()
+        }
 
 })
 
 </script>
 </head>
 
-<body ng-app="mini_app">
+<body ng-app="bucket_app">
 
-	<a href="#/">Dashboard</a> | <a href="#/partials2">Products</a>| <a href="#/partials3">Orders</a>| <a href="#/partials4">Customers</a>| <a href="#/partials5">Settings</a>
+	<a href="#/"></a>   <a href="#/dashboard"></a><a href="#/logout">Logout</a> <a href="#/user/:id"></a>
 	<div ng-view=""></div>
 
 </body>

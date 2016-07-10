@@ -12,6 +12,6 @@ app.use(express.static(path.join(__dirname, './client/static')));
 require('./server/config/mongoose.js');
 require('./server/config/routes.js')(app);
 
-app.listen(2000, function() {
+app.listen(8000, function() {
   console.log('cool stuff on: 8000');
 });
